@@ -55,14 +55,15 @@ second_flip_time = 0
 show_time = 1
 
 
+# Todo: randomize which bundle the images come from
 def load_card_face(image_id):
-    card = "./img/img%s.JPG" % image_id
+    card = "./bundle2/img%s.JPG" % image_id
     img = pygame.image.load(card)
     return img
 
 
 def load_card_back():
-    card = "./cardback/card_back.JPG"
+    card = "./cardback/card_back2.JPG"
     img = pygame.image.load(card)
     return img
 
