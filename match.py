@@ -1,4 +1,5 @@
 import pygame
+import time
 from random import shuffle
 
 # Created by natalie on 2018-01-18
@@ -41,8 +42,17 @@ for i in range(12):
 
 shuffle(original)
 
-concealed = original
+concealed = list(original)
 flipped = []
+found = []
+missed = 0
+first_card = []
+has_first = False
+has_second = False
+second_card = []
+first_flip_time = 0
+second_flip_time = 0
+show_time = 1
 
 
 def load_card_face(image_id):
@@ -57,51 +67,85 @@ def load_card_back():
     return img
 
 
+def calculate_coord(index):
+    y = int(index / 6)
+    x = index - y * 6
+    return [x, y]
+
+
 def load_images():
-    for w in range(6):
-        for h in range(4):
-            img_id = original[h * 6 + w]
-            if img_id in concealed:
-                img = load_card_back()
-            else:
-                img = load_card_face(original[img_id])
-            gameDisplay.blit(img, (w * image_width, h * image_height))
+    for n, j in enumerate(concealed):
+        card_coord = calculate_coord(n)
+        if (j == 's') or (j == 'f'):
+            img = load_card_face(original[n])
+        else:
+            img = load_card_back()
+        gameDisplay.blit(img, (card_coord[0] * image_width, card_coord[1] * image_height))
 
 
 def identify_card(position_pressed):
     x_coord = int(position_pressed[0] / image_width)
     y_coord = int(position_pressed[1] / image_height)
-    card = (x_coord, y_coord)
+    card = [x_coord, y_coord]
     return card
 
 
-first_flip = True
-card_flipped = (10, 10)
+def calculate_index(card_pos):
+    return card_pos[1] * 6 + card_pos[0]
+
+
+def show_card(card_pos):
+    if card_pos:
+        concealed[calculate_index(card_pos)] = 's'
+
+
+def flip_card(card_pos):
+    if card_pos:
+        concealed[calculate_index(card_pos)] = 'f'
+
+
+def hide_card(card_pos):
+    if card_pos:
+        ind = calculate_index(card_pos)
+        if concealed[ind] == 's':
+            concealed[ind] = original[ind]
+
+
+def check_same(card1, card2):
+    if card1 and card2:
+        return original[calculate_index(card1)] == original[calculate_index(card2)]
+
 
 # run game using a while loop
 while not win:
-    for event in pygame.event.get():
+    ev = pygame.event.get()
+    key = pygame.key.get_pressed()
+    for event in ev:
         if event.type == pygame.QUIT:
             win = True
+        elif event.type == pygame.MOUSEBUTTONUP:
+            card_flipped = identify_card(pygame.mouse.get_pos())
+            card_index = calculate_index(card_flipped)
+            if concealed[card_index] != 's' and concealed[card_index] != 'f':
+                if not has_first:
+                    first_flip_time = time.time()
+                    first_card = card_flipped
+                    show_card(card_flipped)
+                    is_first_flip = False
+                    has_first = True
+                elif not has_second:
+                    second_flip_time = time.time()
+                    second_card = card_flipped
+                    show_card(card_flipped)
+                    has_second = True
 
-        # Todo: read mouse click
-        # if event.type == pygame.MOUSEBUTTONUP:
-        #     clicked_position = pygame.mouse.get_pos()
-        #     card_flipped = identify_card(clicked_position)
-        #     print(card_flipped)
-        #     if first_flip:
-        #         first_card = card_flipped
-        #         first_flip = False
-        #     else:
-        #         second_card = card_flipped
-        #         if first_card == second_card:
-        #             flipped.append(second_card)
-        #             if second_card in concealed:
-        #                 concealed.remove(second_card)
-        #         first_flip = False
-
-        print(event)
-
+    if has_first and has_second and check_same(first_card, second_card):
+        flip_card(first_card)
+        flip_card(second_card)
+    if has_second and (time.time() - second_flip_time > show_time):
+        hide_card(second_card)
+        hide_card(first_card)
+        has_first = has_second = False
     load_images()
 
     pygame.display.update()
