@@ -1,16 +1,14 @@
-# Bunny Card Match
+# Card matching game - Bunny edition
 
-A simple memory card game written in python.
+A simple card game to test your memory, written in python.
 
-## Instructions
+### Instructions
 
-The game starts with all cards facing down. Click a card to flip it. If two consecutive cards that you flipped are the same, these two cards will permanently face up. The game will end when all cards face up. The faster you are, the higher your score will be.
-
-This game features three different levels: easy (6 different cards), medium (12 different cards) and hard (24 different cards).
+The game starts with all cards facing down. Click a card to flip it. If two consecutive cards that you flipped are the same, these two cards will permanently face up. The game will end when all cards face up. You can then choose to play again or exit the game.
 
 Bunny Card Match will remember your highest score, so you can challenge your own high score. Enjoy, ᙏ̤̫
 
-## To run the game
+### To run the game
 
 * Download or clone the repo
 * cd into the directory of the repo
