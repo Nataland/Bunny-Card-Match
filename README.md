@@ -6,8 +6,6 @@ A simple card game to test your memory, written in python.
 
 The game starts with all cards facing down. Click a card to flip it. If two consecutive cards that you flipped are the same, these two cards will permanently face up. The game will end when all cards face up. You can then choose to play again or exit the game.
 
-Bunny Card Match will remember your highest score, so you can challenge your own high score. Enjoy, ᙏ̤̫
-
 ### To run the game
 
 * Download or clone the repo
