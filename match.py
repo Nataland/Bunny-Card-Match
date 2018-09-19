@@ -64,44 +64,77 @@ second_card = []
 first_flip_time = 0
 second_flip_time = 0
 show_time = 1
+game_start_time = 0
 start_screen = True
 
+
+def initialize():
+    # Todo: remove global variabls
+    global win, run, original, concealed, flipped, found, missed, first_card, has_first, has_second, second_card
+    global first_flip_time, second_flip_time, show_time, game_start_time, start_screen
+    win = False
+    run = True
+    original = []
+
+    # initialize the position of all concealed images
+    for i in range(12):
+        original.append(i)
+        original.append(i)
+
+    shuffle(original)
+
+    concealed = list(original)
+    flipped = []
+    found = []
+    missed = 0
+    first_card = []
+    has_first = False
+    has_second = False
+    second_card = []
+    first_flip_time = 0
+    second_flip_time = 0
+    show_time = 1
+    game_start_time = 0
+    start_screen = True
 
 def text_objects(text, font, colour):
     text_surface = font.render(text, True, colour)
     return text_surface, text_surface.get_rect()
 
 
-def draw_start_screen(mouse, level):
+def draw_start_screen(mouse):
     gameDisplay.fill(mmm_purple)
-    draw_text(mmm_yellow, "fonts/ARCADE.TTF", 200, "MIFFY", (display_width / 2), 100)
-    draw_text(mmm_yellow, "fonts/ARCADE.TTF", 58, "MEMORY-MATCH", (display_width / 2), 145)
-    draw_text(mmm_cream, "fonts/ARCADE.TTF", 35, "Easy", (display_width / 2) + 26, 215)
-    draw_text(mmm_cream, "fonts/ARCADE.TTF", 35, "Medium", (display_width / 2) + 26, 250)
-    draw_text(mmm_cream, "fonts/ARCADE.TTF", 35, "Hard", (display_width / 2) + 26, 285)
-    draw_interactive_button(mouse, 300, 50, 340, mmm_orange, mmm_orange_lite)
-    draw_interactive_button(mouse, 300, 50, 410, mmm_orange, mmm_orange_lite)
-    draw_interactive_button(mouse, 300, 50, 480, mmm_orange, mmm_orange_lite)
-    pygame.draw.circle(gameDisplay, mmm_cream, (int(display_width / 2) - 56, 210), 9, 3)
-    pygame.draw.circle(gameDisplay, mmm_cream, (int(display_width / 2) - 56, 245), 9, 3)
-    pygame.draw.circle(gameDisplay, mmm_cream, (int(display_width / 2) - 56, 280), 9, 3)
+    draw_text(mmm_cream, "fonts/ARCADE.TTF", 200, "MIFFY", (display_width / 2), 120)
+    draw_text(mmm_cream, "fonts/ARCADE.TTF", 58, "MEMORY-MATCH", (display_width / 2), 165)
+    draw_text(mmm_cream, "fonts/ARCADE.TTF", 35, "Easy", (display_width / 2) + 26, 265)
+    draw_text(mmm_cream, "fonts/ARCADE.TTF", 35, "Medium", (display_width / 2) + 26, 300)
+    draw_text(mmm_cream, "fonts/ARCADE.TTF", 35, "Hard", (display_width / 2) + 26, 335)
+    draw_text(mmm_cream, "fonts/ARCADE.TTF", 35, "Level feature coming soon", (display_width / 2) + 26, 370)
+    start = draw_interactive_button(mouse, 300, 50, 485, mmm_orange, mmm_orange_lite, "START", False)
+    # about = draw_interactive_button(mouse, 300, 50, 480, mmm_orange, mmm_orange_lite, "ABOUT", False)
+    pygame.draw.circle(gameDisplay, mmm_cream, (int(display_width / 2) - 56, 260), 9, 3)
+    pygame.draw.circle(gameDisplay, mmm_cream, (int(display_width / 2) - 56, 295), 9, 3)
+    pygame.draw.circle(gameDisplay, mmm_cream, (int(display_width / 2) - 56, 330), 9, 3)
     select_level()
+    return start
 
 
 def select_level():
     if level == 0:
-        h = 210
+        h = 260
     elif level == 1:
-        h = 245
+        h = 295
     else:
-        h = 280
+        h = 330
     pygame.draw.circle(gameDisplay, mmm_cream, (int(display_width / 2) - 56, h), 2)
 
 
-def draw_win_screen():
+def draw_win_screen(mouse):
     gameDisplay.fill(mmm_purple)
-    draw_text(mmm_yellow, "fonts/ARCADE.TTF", 150, "Congrats!", (display_width / 2), 100)
-    draw_text(mmm_yellow, "fonts/ARCADE.TTF", 58, "You found all the pieces", (display_width / 2), 170)
+    draw_text(mmm_yellow, "fonts/ARCADE.TTF", 150, "Congrats!", (display_width / 2), 200)
+    draw_text(mmm_yellow, "fonts/ARCADE.TTF", 58, "You found all the pieces", (display_width / 2), 270)
+    restart = draw_interactive_button(mouse, 300, 50, 485, mmm_orange, mmm_orange_lite, "PLAY AGAIN", True)
+    return restart
 
 
 def draw_text(colour, font, size, content, center_x, center_y):
@@ -111,16 +144,23 @@ def draw_text(colour, font, size, content, center_x, center_y):
     gameDisplay.blit(text_surf, text_rect)
 
 
-def draw_interactive_button(mouse, w, h, y, colour, secondary_colour):
-    # Todo: add text to the buttons, choose content, text size and text font
+def draw_interactive_button(mouse, w, h, y, colour, secondary_colour, text, restart):
+    stay_on_start_screen = True
     x = display_width / 2 - w / 2
+    click = pygame.mouse.get_pressed()
     if x + w > mouse[0] > x and y + h > mouse[1] > y:
         pygame.draw.rect(gameDisplay, secondary_colour, (x, y, w, h))
+        if click[0] == 1:
+            stay_on_start_screen = False
+            if restart:
+                initialize()
     else:
         pygame.draw.rect(gameDisplay, colour, (x, y, w, h))
 
+    draw_text(mmm_cream, "fonts/ARCADE.TTF", 50, text, display_width / 2, y + 32)
+    return stay_on_start_screen
 
-# Todo: randomize which bundle the images come from
+
 def load_card_face(image_id):
     card = "./bundle1/img%s.JPG" % image_id
     img = pygame.image.load(card)
@@ -198,6 +238,8 @@ while run:
         if event.type == pygame.QUIT:
             run = False
         elif event.type == pygame.KEYDOWN:
+            # if event.key == pygame.K_SPACE: # Uncomment this line for testing
+            #     win = True
             if start_screen:
                 if event.key == pygame.K_RETURN:
                     start_screen = False
@@ -208,11 +250,11 @@ while run:
                     if level == 1 or level == 2:
                         level -= 1
                 elif event.key == pygame.K_ESCAPE:
-                    win = True
-        elif event.type == pygame.MOUSEBUTTONUP:
+                    run = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
             card_flipped = identify_card(pygame.mouse.get_pos())
             card_index = calculate_index(card_flipped)
-            if concealed[card_index] != 's' and concealed[card_index] != 'f':
+            if concealed[card_index] != 's' and concealed[card_index] != 'f' and not start_screen:
                 if not has_first:
                     first_flip_time = time.time()
                     first_card = card_flipped
@@ -232,15 +274,17 @@ while run:
         hide_card(second_card)
         hide_card(first_card)
         has_first = has_second = False
+
     win = check_win()
 
     mouse = pygame.mouse.get_pos()
     if start_screen:
-        draw_start_screen(mouse, level)
+        start_screen = draw_start_screen(mouse)
     elif not win:
         load_images()
     else:
-        draw_win_screen()
+        restart = draw_win_screen(mouse)
+        # Todo: add a lag between winning and showing the restart screen
 
     pygame.display.update()
     clock.tick(60)
